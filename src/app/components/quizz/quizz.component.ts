@@ -36,7 +36,8 @@ export class QuizzComponent implements OnInit {
 
   playerChoose(value: string) {
     this.answers.push(value);
-    console.log(this.answers);
+
+    this.nextStep();
   }
 
   async nextStep() {
@@ -45,7 +46,28 @@ export class QuizzComponent implements OnInit {
     if (this.questionMaxIndex > this.questionIndex) {
       this.questionsSelected = this.questions[this.questionIndex];
     } else {
+      const finalAnswer: string = await this.checkResult(this.answers);
+
+      this.answerSelected =
+        quizz_questions.results[
+          finalAnswer as keyof typeof quizz_questions.results
+        ];
+
       this.finished = true;
     }
+  }
+
+  async checkResult(answers: string[]) {
+    const result = answers.reduce((acc, cur, i, arr) => {
+      if (
+        arr.filter((item) => item === acc) > arr.filter((item) => item === cur)
+      ) {
+        return acc;
+      } else {
+        return cur;
+      }
+    });
+
+    return result;
   }
 }
